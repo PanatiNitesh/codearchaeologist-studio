@@ -1,0 +1,23 @@
+services:
+  # =========================================================================
+  # Render Web Service: CodeArchaeologist Full-Stack App (FastAPI + React)
+  # =========================================================================
+  - type: web
+    name: code-archaeologist
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: "./build.sh"
+    startCommand: "python backend/run.py"
+    healthCheckPath: "/api/health"
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.8"
+      - key: NODE_VERSION
+        value: "20.11.1"
+      - key: RENDER
+        value: "true"
+      - key: HOST
+        value: "0.0.0.0"
+      - key: PORT
+        value: "10000"

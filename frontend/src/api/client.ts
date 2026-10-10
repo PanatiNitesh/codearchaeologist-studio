@@ -190,10 +190,24 @@ export interface OverallEvaluation {
   summary: string;
 }
 
+async function safeJson<T = any>(res: Response): Promise<T> {
+  if (!res.ok) {
+    let errDetail = '';
+    try {
+      const errJson = await res.json();
+      errDetail = errJson.detail || JSON.stringify(errJson);
+    } catch {
+      errDetail = await res.text().catch(() => res.statusText);
+    }
+    throw new Error(errDetail || `HTTP error ${res.status}`);
+  }
+  return res.json();
+}
+
 export const api = {
   async getRepositories(): Promise<RepositoryItem[]> {
     const res = await fetch(`${API_BASE}/repositories`);
-    return res.json();
+    return safeJson(res);
   },
 
   async ingest(repo_url_or_path: string, force_reclone: boolean = false): Promise<any> {
@@ -202,8 +216,7 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ repo_url_or_path, force_reclone })
     });
-    if (!res.ok) throw new Error(await res.text());
-    return res.json();
+    return safeJson(res);
   },
 
   async ingestAsync(repo_url_or_path: string, force_reclone: boolean = false): Promise<{ task_id: string; status: string }> {
@@ -212,8 +225,7 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ repo_url_or_path, force_reclone })
     });
-    if (!res.ok) throw new Error(await res.text());
-    return res.json();
+    return safeJson(res);
   },
 
   async uploadRepoZip(file: File): Promise<{ task_id: string; status: string; repo_id?: string }> {
@@ -223,56 +235,53 @@ export const api = {
       method: 'POST',
       body: formData
     });
-    if (!res.ok) throw new Error(await res.text());
-    return res.json();
+    return safeJson(res);
   },
 
   async getTaskStatus(taskId: string): Promise<{ task_id: string; status: string; progress?: string; repo_id?: string; error?: string }> {
     const res = await fetch(`${API_BASE}/tasks/${taskId}`);
-    if (!res.ok) throw new Error(await res.text());
-    return res.json();
+    return safeJson(res);
   },
 
   async loadSample(): Promise<any> {
     const res = await fetch(`${API_BASE}/load-sample`, { method: 'POST' });
-    if (!res.ok) throw new Error(await res.text());
-    return res.json();
+    return safeJson(res);
   },
 
   async getFiles(repoId: string): Promise<FileItem[]> {
     const res = await fetch(`${API_BASE}/repo/${repoId}/files`);
-    const data = await res.json();
+    const data = await safeJson(res);
     return data.files || [];
   },
 
   async getFileContent(repoId: string, path: string): Promise<any> {
     const res = await fetch(`${API_BASE}/repo/${repoId}/file-content?path=${encodeURIComponent(path)}`);
-    return res.json();
+    return safeJson(res);
   },
 
   async getGraph(repoId: string): Promise<SoftwareGraph> {
     const res = await fetch(`${API_BASE}/repo/${repoId}/graph`);
-    return res.json();
+    return safeJson(res);
   },
 
   async getTimeline(repoId: string): Promise<SoftwareTimeline> {
     const res = await fetch(`${API_BASE}/repo/${repoId}/timeline`);
-    return res.json();
+    return safeJson(res);
   },
 
   async getFileIntelligence(repoId: string, filePath: string): Promise<FileEvolution> {
     const res = await fetch(`${API_BASE}/repo/${repoId}/file-intelligence?file_path=${encodeURIComponent(filePath)}`);
-    return res.json();
+    return safeJson(res);
   },
 
   async calculateBlastRadius(repoId: string, targetFile: string): Promise<BlastRadiusResult> {
     const res = await fetch(`${API_BASE}/repo/${repoId}/blast-radius?target_file=${encodeURIComponent(targetFile)}`);
-    return res.json();
+    return safeJson(res);
   },
 
   async predictImpact(repoId: string, targetFile: string): Promise<ChangeImpactPrediction> {
     const res = await fetch(`${API_BASE}/repo/${repoId}/predict-impact?target_file=${encodeURIComponent(targetFile)}`);
-    return res.json();
+    return safeJson(res);
   },
 
   async askAI(repoId: string, question: string): Promise<RAGAnswerResponse> {
@@ -281,18 +290,17 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ question })
     });
-    return res.json();
+    return safeJson(res);
   },
 
   async getEvaluation(repoId: string): Promise<OverallEvaluation> {
     const res = await fetch(`${API_BASE}/repo/${repoId}/evaluation`);
-    return res.json();
+    return safeJson(res);
   },
 
   async getRefactorScenarios(repoId: string): Promise<RefactorScenarioItem[]> {
     const res = await fetch(`${API_BASE}/repo/${repoId}/refactor-scenarios`);
-    if (!res.ok) throw new Error(await res.text());
-    return res.json();
+    return safeJson(res);
   },
 
   async simulateRefactor(repoId: string, scenarioId?: string, customChange?: string): Promise<RefactorSimulationResult> {
@@ -301,14 +309,12 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ scenario_id: scenarioId, custom_change: customChange })
     });
-    if (!res.ok) throw new Error(await res.text());
-    return res.json();
+    return safeJson(res);
   },
 
   async getFleetScale(repoId: string): Promise<FleetScaleData> {
     const res = await fetch(`${API_BASE}/repo/${repoId}/fleet-scale`);
-    if (!res.ok) throw new Error(await res.text());
-    return res.json();
+    return safeJson(res);
   },
 
   async trackEvent(eventType: string, repoId?: string, details?: any): Promise<void> {

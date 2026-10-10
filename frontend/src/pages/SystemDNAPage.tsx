@@ -30,9 +30,48 @@ interface SystemDNAPageProps {
   onAskAI?: (prompt: string) => void;
 }
 
+const DEFAULT_SCENARIOS: RefactorScenarioItem[] = [
+  {
+    id: "scenario_rename_customer_id",
+    title: "Rename 'customer_id' to 'account_uuid'",
+    category: "High-Risk Database Refactor",
+    description: "Cross-layer database column rename spanning SQL schema, ORM entities, domain services, REST controller endpoints, and frontend state.",
+    target_symbol: "customer_id",
+    risk_level: "CRITICAL",
+    estimated_waves: 4
+  },
+  {
+    id: "scenario_enum_payment_status",
+    title: "Extend 'PaymentStatus' Enum (Add 'PROCESSING' & 'SETTLED')",
+    category: "State Machine Evolution",
+    description: "Splits synchronous settlement into asynchronous two-phase states, requiring non-breaking backward compatibility in legacy audit events.",
+    target_symbol: "PaymentStatus",
+    risk_level: "HIGH",
+    estimated_waves: 3
+  },
+  {
+    id: "scenario_decouple_checkout_api",
+    title: "Decouple Monolithic Ingress '/checkout' into Event-Driven Worker",
+    category: "Cloud Architecture Modernization",
+    description: "Refactors synchronous checkout controller route into an event-driven SQS/Kinesis publisher with canary traffic cutover.",
+    target_symbol: "checkoutController",
+    risk_level: "CRITICAL",
+    estimated_waves: 4
+  },
+  {
+    id: "scenario_auth_token_to_jwt",
+    title: "Migrate Session Cookie to Asymmetric RS256 Bearer Token",
+    category: "Zero-Trust Security Hardening",
+    description: "Upgrades legacy stateful auth headers to JWT verification while maintaining dual-mode session validation during cutover.",
+    target_symbol: "authService",
+    risk_level: "HIGH",
+    estimated_waves: 3
+  }
+];
+
 export const SystemDNAPage: React.FC<SystemDNAPageProps> = ({ repoId, onAskAI }) => {
   const [activeTab, setActiveTab] = useState<'refactor' | 'waves' | 'fleet' | 'pr' | 'iac'>('refactor');
-  const [scenarios, setScenarios] = useState<RefactorScenarioItem[]>([]);
+  const [scenarios, setScenarios] = useState<RefactorScenarioItem[]>(DEFAULT_SCENARIOS);
   const [selectedScenarioId, setSelectedScenarioId] = useState<string>('scenario_rename_customer_id');
   const [customInput, setCustomInput] = useState<string>('');
   const [simulation, setSimulation] = useState<RefactorSimulationResult | null>(null);
@@ -52,14 +91,20 @@ export const SystemDNAPage: React.FC<SystemDNAPageProps> = ({ repoId, onAskAI })
     setLoading(true);
     try {
       const [scenariosRes, fleetRes] = await Promise.all([
-        api.getRefactorScenarios(repoId),
-        api.getFleetScale(repoId)
+        api.getRefactorScenarios(repoId).catch(() => DEFAULT_SCENARIOS),
+        api.getFleetScale(repoId).catch(() => null)
       ]);
-      setScenarios(scenariosRes);
-      setFleetData(fleetRes);
+      if (scenariosRes && scenariosRes.length > 0) {
+        setScenarios(scenariosRes);
+      }
+      if (fleetRes) setFleetData(fleetRes);
 
-      const simRes = await api.simulateRefactor(repoId, selectedScenarioId);
-      setSimulation(simRes);
+      try {
+        const simRes = await api.simulateRefactor(repoId, selectedScenarioId);
+        setSimulation(simRes);
+      } catch (simErr) {
+        console.warn('Initial refactor simulation deferred or retrying:', simErr);
+      }
     } catch (err) {
       console.error('Failed to load SystemDNA data:', err);
     } finally {
@@ -74,7 +119,7 @@ export const SystemDNAPage: React.FC<SystemDNAPageProps> = ({ repoId, onAskAI })
       const res = await api.simulateRefactor(repoId, scenarioId || selectedScenarioId, custom || customInput);
       setSimulation(res);
     } catch (err) {
-      console.error('Failed to simulate refactor:', err);
+      console.warn('Failed to simulate refactor on remote repo:', err);
     } finally {
       setLoading(false);
     }

@@ -23,13 +23,12 @@ import {
   Moon,
   Zap,
   Upload,
-  FileArchive,
-  FolderArchive
+  FileArchive
 } from 'lucide-react';
 import { RepositoryItem, api } from '../api/client';
 
 export type AppPage = 'overview' | 'architecture' | 'blast-radius' | 'systemdna' | 'handover' | 'archaeology' | 'assistant' | 'evaluation';
-export type AppTheme = 'light' | 'dark' | 'cyber' | 'aurora' | 'titanium' | 'daybreak';
+export type AppTheme = 'light' | 'dark' | 'cyber' | 'aurora' | 'titanium' | 'daybreak' | 'studio';
 
 export interface HeaderProps {
   repositories: RepositoryItem[];
@@ -37,9 +36,9 @@ export interface HeaderProps {
   onSelectRepo: (id: string) => void;
   onIngest: (url: string) => Promise<void>;
   onLoadSample: () => Promise<void>;
-  onOpenEval: () => void;
+  onOpenEval?: () => void;
   onOpenAnalytics: () => void;
-  onOpenSystemDNA: () => void;
+  onOpenSystemDNA?: () => void;
   loading: boolean;
   activePage: AppPage;
   onNavigate: (page: AppPage) => void;
@@ -53,7 +52,9 @@ export const Header: React.FC<HeaderProps> = ({
   onSelectRepo,
   onIngest,
   onLoadSample,
+  onOpenEval,
   onOpenAnalytics,
+  onOpenSystemDNA,
   loading,
   activePage,
   onNavigate,
@@ -72,7 +73,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   const currentRepo = repositories.find(r => r.id === currentRepoId);
 
-  const navItems: { id: AppPage; label: string; icon: React.FC<{ className?: string }>; badge?: string }[] = [
+  const navItems: { id: AppPage; label: string; icon: React.ComponentType<any>; badge?: string }[] = [
     { id: 'overview', label: 'Overview', icon: LayoutDashboard },
     { id: 'architecture', label: 'Topology Graph', icon: Compass },
     { id: 'blast-radius', label: 'Blast Radius', icon: Flame },
@@ -83,16 +84,24 @@ export const Header: React.FC<HeaderProps> = ({
     { id: 'evaluation', label: 'Benchmarks', icon: BarChart2 }
   ];
 
-  const themeOptions: { id: AppTheme; label: string; icon: React.FC<{ className?: string }>; desc: string }[] = [
+  const themeOptions: { id: AppTheme; label: string; icon: React.ComponentType<any>; desc: string }[] = [
     { id: 'light', label: 'Light Clean (Pro)', icon: Sun, desc: 'Ultra-crisp modern Silicon Valley SaaS look' },
     { id: 'dark', label: 'Dark Titanium', icon: Moon, desc: 'High-contrast stealth graphite' },
     { id: 'cyber', label: 'Cyber Neon', icon: Zap, desc: 'Luminous cyan, radiant violet & glass glow' },
     { id: 'aurora', label: 'Cosmic Aurora', icon: Palette, desc: 'Deep sapphire & northern lights' }
   ];
 
+  const getThemeLabel = (t: string) => {
+    if (t === 'light') return 'Light';
+    if (t === 'cyber') return 'Cyber';
+    if (t === 'aurora') return 'Aurora';
+    return 'Dark';
+  };
+
   const startTaskPolling = (taskId: string, fallbackUrl?: string) => {
     let attempts = 0;
-    const pollInterval = setInterval(async () => {
+    let pollInterval: any = null;
+    pollInterval = setInterval(async () => {
       attempts++;
       try {
         const statusData = await api.getTaskStatus(taskId);
@@ -100,7 +109,7 @@ export const Header: React.FC<HeaderProps> = ({
           setIngestStatusText(statusData.progress);
         }
         if (statusData.status === 'completed') {
-          clearInterval(pollInterval);
+          if (pollInterval) clearInterval(pollInterval);
           setIngestLoading(false);
           setShowIngestModal(false);
           setInputUrl('');
@@ -112,12 +121,12 @@ export const Header: React.FC<HeaderProps> = ({
             await onIngest(fallbackUrl);
           }
         } else if (statusData.status === 'failed') {
-          clearInterval(pollInterval);
+          if (pollInterval) clearInterval(pollInterval);
           setIngestLoading(false);
           setIngestStatusText('');
           alert(`Ingestion failed: ${statusData.error || 'Unknown error'}`);
         } else if (attempts > 600) {
-          clearInterval(pollInterval);
+          if (pollInterval) clearInterval(pollInterval);
           setIngestLoading(false);
           setIngestStatusText('');
           alert('Ingestion is taking longer than expected. The task is continuing in the background—please check back shortly or refresh the page.');
@@ -298,7 +307,7 @@ export const Header: React.FC<HeaderProps> = ({
               title="Change UI Theme"
             >
               <Palette style={{ width: 13, height: 13 }} />
-              <span className="hidden md:inline" style={{ fontSize: 12 }}>{currentTheme === 'light' ? 'Light' : currentTheme === 'dark' || currentTheme === 'studio' ? 'Dark' : currentTheme === 'cyber' ? 'Cyber' : 'Aurora'}</span>
+              <span className="hidden md:inline" style={{ fontSize: 12 }}>{getThemeLabel(currentTheme)}</span>
               <ChevronDown style={{ width: 11, height: 11, color: 'var(--text-muted)' }} />
             </button>
 
