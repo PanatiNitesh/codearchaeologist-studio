@@ -24,6 +24,10 @@ from backend.app.phase1_ingestion.repo_db import RepoDatabaseService
 from backend.app.phase8_modernization.systemdna_engine import SystemDNAEngine
 from backend.app.pipeline import CodeArchaeologistPipeline
 from backend.app.utils.sample_generator import create_sample_repository
+from backend.app.phase8_modernization.handover_engine import ShiftHandoverEngine
+from backend.app.phase4_archaeology.chesterton_engine import ChestertonFenceEngine
+from backend.app.phase7_evaluation.halfdone_bench import HalfDoneBenchEvaluator
+from backend.app.phase7_evaluation.precision_matrix import PrecisionMatrixEvaluator
 from backend.app.models.schemas import (
     RAGAnswerResponse,
     BlastRadiusResult,
@@ -31,7 +35,8 @@ from backend.app.models.schemas import (
     OverallEvaluation,
     SoftwareGraph,
     SoftwareTimeline,
-    FileEvolution
+    FileEvolution,
+    HandoverBriefing
 )
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
@@ -75,6 +80,10 @@ class ChatRequest(BaseModel):
 class SimulateRefactorRequest(BaseModel):
     scenario_id: Optional[str] = None
     custom_change: Optional[str] = None
+
+class HandoverGenerateRequest(BaseModel):
+    scenario_id: Optional[str] = None
+    custom_diff: Optional[str] = None
 
 class AnalyticsTrackRequest(BaseModel):
     event_type: str
@@ -605,6 +614,97 @@ def get_fleet_scale(repo_id: str):
         details={}
     )
     return pipeline.systemdna_engine.get_fleet_scale_data()
+
+@app.get("/api/repo/{repo_id}/handover", response_model=HandoverBriefing)
+def get_shift_handover(repo_id: str, scenario_id: Optional[str] = Query(None)):
+    """
+    Retrieves real Shift Handover WIP contracts, unapplied systematic edits,
+    and mined invariants based on active Git diff / branch state.
+    """
+    pipeline = get_or_load_pipeline(repo_id)
+    engine = ShiftHandoverEngine(
+        pipeline.repo_path,
+        software_graph=pipeline.software_graph,
+        files_data=pipeline.files_data,
+        commits=pipeline.commits
+    )
+    db_service.db.record_analytics_event(
+        event_type="shift_handover_view",
+        repo_id=repo_id,
+        details={"scenario_id": scenario_id}
+    )
+    return engine.audit_wip(scenario_id=scenario_id)
+
+@app.post("/api/repo/{repo_id}/handover/generate", response_model=HandoverBriefing)
+def generate_handover_briefing(repo_id: str, req: HandoverGenerateRequest):
+    """
+    Synthesizes AI continuation briefing, generates unified patches for broken callers,
+    and validates safety invariants against the WIP diff.
+    """
+    pipeline = get_or_load_pipeline(repo_id)
+    engine = ShiftHandoverEngine(
+        pipeline.repo_path,
+        software_graph=pipeline.software_graph,
+        files_data=pipeline.files_data,
+        commits=pipeline.commits
+    )
+    db_service.db.record_analytics_event(
+        event_type="shift_handover_generate",
+        repo_id=repo_id,
+        details={"scenario_id": req.scenario_id}
+    )
+    return engine.audit_wip(custom_diff=req.custom_diff, scenario_id=req.scenario_id)
+
+@app.get("/api/repo/{repo_id}/chesterton")
+def get_chesterton_analysis(repo_id: str, target_file: str = Query(...)):
+    """
+    Calculates Chesterton's Fence risk score, decision provenance,
+    knowledge-loss map, and calibrated blast radius for target_file.
+    """
+    pipeline = get_or_load_pipeline(repo_id)
+    fence_engine = ChestertonFenceEngine(
+        pipeline.commits,
+        pipeline.files_data,
+        software_graph=pipeline.software_graph
+    )
+    db_service.db.record_analytics_event(
+        event_type="chesterton_view",
+        repo_id=repo_id,
+        details={"target_file": target_file}
+    )
+    return {
+        "fence_score": fence_engine.calculate_fence_score(target_file),
+        "provenance": fence_engine.get_decision_provenance(target_file),
+        "knowledge_loss": fence_engine.get_knowledge_loss_map(),
+        "calibrated_blast_radius": fence_engine.evaluate_calibrated_blast_radius()
+    }
+
+@app.get("/api/repo/{repo_id}/knowledge-loss")
+def get_knowledge_loss(repo_id: str):
+    """
+    Identifies orphan modules where all original authors have departed (institutional bus factor).
+    """
+    pipeline = get_or_load_pipeline(repo_id)
+    fence_engine = ChestertonFenceEngine(pipeline.commits, pipeline.files_data)
+    return fence_engine.get_knowledge_loss_map()
+
+@app.get("/api/repo/{repo_id}/benchmark/halfdone")
+def run_halfdone_benchmark(repo_id: str, tasks: int = Query(5)):
+    """
+    Executes HalfDone-Bench: evaluates recovery of held-out shift edits on multi-file commits.
+    """
+    pipeline = get_or_load_pipeline(repo_id)
+    evaluator = HalfDoneBenchEvaluator(pipeline.repo_path, pipeline.files_data, pipeline.commits)
+    return evaluator.run_benchmark(max_tasks=tasks)
+
+@app.get("/api/repo/{repo_id}/precision-matrix")
+def get_precision_matrix(repo_id: str, target_symbol: str = Query("customer_id")):
+    """
+    Measures authentic text grep vs compiler symbol resolver precision rate on the repository.
+    """
+    pipeline = get_or_load_pipeline(repo_id)
+    evaluator = PrecisionMatrixEvaluator(pipeline.files_data)
+    return evaluator.compute_precision_matrix(target_symbol)
 
 @app.get("/{full_path:path}")
 def catch_all(full_path: str):

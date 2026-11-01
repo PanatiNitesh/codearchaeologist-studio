@@ -97,13 +97,29 @@ class CodeASTParser:
         re.MULTILINE
     )
 
+    def __init__(self):
+        try:
+            from backend.app.phase2_ast.tree_sitter_parser import TreeSitterASTParser
+            self.tree_sitter = TreeSitterASTParser()
+        except Exception as e:
+            logger.warning(f"Could not initialize TreeSitterASTParser: {e}")
+            self.tree_sitter = None
+
     def parse_file(self, rel_path: str, content: str) -> Dict[str, Any]:
         """
         Parses code content and returns symbols, imports, exports, and call hierarchy.
-        Routes Python files to the native Python AST engine, and JS/TS to the enhanced parser.
+        Routes Python files to the native Python AST engine.
+        Uses compiler-grade Tree-Sitter AST parser for TS, JS, Java, Go, falling back to regex.
         """
         if rel_path.endswith(".py"):
             return self._parse_python_file(rel_path, content)
+
+        # Attempt compiler-grade tree-sitter parsing for TS, JS, Java, and Go
+        if self.tree_sitter:
+            ts_res = self.tree_sitter.parse(rel_path, content)
+            if ts_res is not None:
+                return ts_res
+
         return self._parse_jsts_file(rel_path, content)
 
     # =========================================================================

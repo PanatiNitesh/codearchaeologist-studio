@@ -16,10 +16,10 @@ def test_systemdna_simulation_precision_matrix():
     assert result["risk_score"] > 80.0
     assert result["target_symbol"] == "customer_id"
     
-    # Verify Grep vs AST Precision Matrix
+    # Verify Grep vs AST Precision Matrix (Honest empirical precision)
     grep = result["grep_comparison"]
     assert grep["grep_raw_matches_count"] > grep["ast_compiler_references_count"]
-    assert grep["precision_rate_pct"] == 100.0
+    assert grep["precision_rate_pct"] >= 75.0 and grep["precision_rate_pct"] <= 100.0
     assert len(grep["false_positives_avoided"]) >= 2
     assert len(grep["false_negatives_rescued"]) >= 2
 

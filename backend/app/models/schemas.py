@@ -198,3 +198,66 @@ class OverallEvaluation(BaseModel):
     blast_radius_eval: EvaluationMetrics
     commit_count_evaluated: int
     summary: str
+
+# =============================================================================
+# SHIFT HANDOVER PRO & CONTINUATION SCHEMAS
+# =============================================================================
+class HandoverCompletedItem(BaseModel):
+    file: str
+    desc: str
+    lines: str
+    evidence: Optional[str] = None
+    test_status: str = "VERIFIED"
+
+class HandoverIncompleteItem(BaseModel):
+    file: str
+    desc: str
+    risk: str = "HIGH" # CRITICAL, HIGH, MEDIUM
+    action: str
+    caller_symbol: Optional[str] = None
+    target_contract: Optional[str] = None
+    patch_diff: Optional[str] = None
+
+class SafetyInvariantItem(BaseModel):
+    rule: str
+    status: str = "VERIFIED" # VERIFIED, WARNING, VIOLATED
+    detail: str
+    violation_count: int = 0
+    mined_confidence: float = 0.95
+
+class SystematicEditRule(BaseModel):
+    rule_id: str
+    description: str
+    antecedent_pattern: str
+    consequent_pattern: str
+    applied_count: int
+    pending_count: int
+    pending_sites: List[Dict[str, Any]] = []
+    academic_citations: List[str] = [
+        "Meng et al., 'LASE: Locating and Applying Systematic Edits by Learning from Examples' (ICSE 2013)",
+        "Bader et al., 'Getafix: Learning to Fix Bugs Automatically' (OOPSLA 2019)",
+        "Rolim et al., 'Learning Syntactic Program Transformations from Examples (Refazer)' (IEEE TSE 2018)"
+    ]
+
+class HandoverBriefing(BaseModel):
+    repo_id: str
+    scenario_id: Optional[str] = None
+    title: str
+    tag: str = "Shift Handover"
+    domain: str = "Software Engineering"
+    objective: str
+    departing_engineer: str
+    shift_time: str
+    progress_percent: int
+    wip_diff_summary: Dict[str, Any] = {}
+    completed_items: List[HandoverCompletedItem] = []
+    incomplete_items: List[HandoverIncompleteItem] = []
+    safety_invariants: List[SafetyInvariantItem] = []
+    systematic_edits: List[SystematicEditRule] = []
+    code_before: str = ""
+    code_after_wip: str = ""
+    generated_unified_patches: List[Dict[str, str]] = []
+    recommended_next_steps: List[str] = []
+    markdown_briefing: str = ""
+    slack_briefing: str = ""
+

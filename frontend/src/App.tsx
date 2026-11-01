@@ -321,6 +321,7 @@ export const App: React.FC = () => {
 
           {activePage === 'handover' && (
             <HandoverPage
+              repoId={currentRepoId}
               files={files}
               onNavigate={(page: string) => setActivePage(page as AppPage)}
             />

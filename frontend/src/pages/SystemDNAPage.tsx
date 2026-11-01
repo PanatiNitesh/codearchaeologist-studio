@@ -147,14 +147,14 @@ export const SystemDNAPage: React.FC<SystemDNAPageProps> = ({ repoId, onAskAI })
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-xl md:text-2xl font-bold text-[var(--text-primary)] tracking-tight">
-                  SystemDNA & Cloud Migration Accelerator
+                  SystemDNA: Migration Plan Preview
                 </h1>
                 <span className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/50">
-                  ForgeHacks 2026
+                  Migration Plan Preview
                 </span>
               </div>
               <p className="text-xs text-[var(--text-secondary)]">
-                Deep AST Refactoring • Grep Precision Matrix • Multi-Wave Scoped Fixers • 1,000-App Enterprise Modernization
+                Topological Migration Waves • Grep vs Compiler Precision Matrix • Scoped Wave Permits • Executable Rename Patches
               </p>
             </div>
           </div>
@@ -162,7 +162,7 @@ export const SystemDNAPage: React.FC<SystemDNAPageProps> = ({ repoId, onAskAI })
 
         <div className="flex items-center gap-2">
           <span className="text-xs font-mono text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-3 py-1.5 rounded-lg border border-emerald-200 dark:border-emerald-800/50 font-semibold">
-            AST Precision: 100%
+            Measured AST Precision: {simulation?.grep_comparison?.precision_rate_pct ?? 85.7}%
           </span>
         </div>
       </div>

@@ -31,6 +31,8 @@ IGNORE_DIRS = {
     ".gradle",
     "Pods",
     "cloned_repos",
+    "sample_repos",
+    ".pytest_cache",
     ".turbo",
     "storybook-static"
 }

@@ -317,6 +317,43 @@ export const api = {
     return safeJson(res);
   },
 
+  async getShiftHandover(repoId: string, scenarioId?: string): Promise<any> {
+    const url = scenarioId 
+      ? `${API_BASE}/repo/${repoId}/handover?scenario_id=${encodeURIComponent(scenarioId)}`
+      : `${API_BASE}/repo/${repoId}/handover`;
+    const res = await fetch(url);
+    return safeJson(res);
+  },
+
+  async generateHandover(repoId: string, scenarioId?: string, customDiff?: string): Promise<any> {
+    const res = await fetch(`${API_BASE}/repo/${repoId}/handover/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ scenario_id: scenarioId, custom_diff: customDiff })
+    });
+    return safeJson(res);
+  },
+
+  async getChestertonAnalysis(repoId: string, targetFile: string): Promise<any> {
+    const res = await fetch(`${API_BASE}/repo/${repoId}/chesterton?target_file=${encodeURIComponent(targetFile)}`);
+    return safeJson(res);
+  },
+
+  async getKnowledgeLoss(repoId: string): Promise<any> {
+    const res = await fetch(`${API_BASE}/repo/${repoId}/knowledge-loss`);
+    return safeJson(res);
+  },
+
+  async getHalfDoneBenchmark(repoId: string, tasks: number = 5): Promise<any> {
+    const res = await fetch(`${API_BASE}/repo/${repoId}/benchmark/halfdone?tasks=${tasks}`);
+    return safeJson(res);
+  },
+
+  async getPrecisionMatrix(repoId: string, targetSymbol: string = 'customer_id'): Promise<any> {
+    const res = await fetch(`${API_BASE}/repo/${repoId}/precision-matrix?target_symbol=${encodeURIComponent(targetSymbol)}`);
+    return safeJson(res);
+  },
+
   async trackEvent(eventType: string, repoId?: string, details?: any): Promise<void> {
     try {
       await fetch(`${API_BASE}/analytics/track`, {

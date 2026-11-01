@@ -224,7 +224,7 @@ REQUIRED RESPONSE STRUCTURE (1000/10 GOLD STANDARD):
 ### 🎯 Direct Answer
 [Provide a decisive, 2-3 sentence answer directly addressing '{question}'. State the exact primary file, function/class, or commit that answers it immediately. Cite exact evidence with [E1], [E2] etc.]
 
-### 🏛️ Core Implementation & Architectural Flow
+### 🏛️ Architectural Analysis & Implementation Flow
 [Explain the underlying design, component responsibilities, and execution flow step-by-step. Reference specific files, symbols, and lines with [E#].]
 
 ### 📜 Historical Evolution & Git Rationale
@@ -311,7 +311,7 @@ REQUIRED RESPONSE STRUCTURE (1000/10 GOLD STANDARD):
 ### 🎯 Direct Answer
 [Provide a decisive, 2-3 sentence answer directly addressing '{question}'. State the exact primary file, function/class, or commit that answers it immediately. Cite exact evidence with [E1], [E2] etc.]
 
-### 🏛️ Core Implementation & Architectural Flow
+### 🏛️ Architectural Analysis & Implementation Flow
 [Explain the underlying design, component responsibilities, and execution flow step-by-step. Reference specific files, symbols, and lines with [E#].]
 
 ### 📜 Historical Evolution & Git Rationale
@@ -483,7 +483,7 @@ CRITICAL RULES:
         # 2. 🏛️ CORE ARCHITECTURAL IMPLEMENTATION
         # -------------------------------------------------------------
         if code_items:
-            parts.append(f"### 🏛️ Core Implementation & Architectural Flow\n\n")
+            parts.append(f"### 🏛️ Architectural Analysis & Implementation Flow\n\n")
             parts.append(
                 f"AST static analysis identifies **`{primary_path}`** (`{primary_comp}`) as the primary execution locus. "
                 f"Key structural definitions and entry points include:\n\n"
