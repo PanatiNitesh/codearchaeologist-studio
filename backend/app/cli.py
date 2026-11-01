@@ -3,6 +3,11 @@ import argparse
 import logging
 from pathlib import Path
 
+# Ensure workspace root is in sys.path
+_repo_root = str(Path(__file__).resolve().parent.parent.parent)
+if _repo_root not in sys.path:
+    sys.path.insert(0, _repo_root)
+
 # Ensure UTF-8 output encoding on Windows console
 if hasattr(sys.stdout, "reconfigure"):
     try:
@@ -18,6 +23,7 @@ from backend.app.phase2_ast.parser import CodeASTParser
 from backend.app.phase4_archaeology.commit_miner import CommitMiner
 
 logging.basicConfig(level=logging.WARNING)
+logger = logging.getLogger("ca_cli")
 
 def build_engine(repo_dir: str):
     from backend.app.phase1_ingestion.repo_db import RepoDatabaseService
@@ -120,7 +126,12 @@ def main():
     p_bench.set_defaults(func=cmd_benchmark)
 
     args = parser.parse_args()
-    args.func(args)
+    try:
+        args.func(args)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()

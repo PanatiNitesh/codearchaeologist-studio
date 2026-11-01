@@ -125,23 +125,12 @@ class TreeSitterASTParser:
                 return ""
             return content_bytes[node.start_byte:node.end_byte].decode("utf-8", errors="replace")
 
-        def extract_calls_from_subtree(node, call_target_set: Set[str]):
-            """Recursively finds calls within a function or method body."""
-            if node.type == "call_expression":
-                fn_child = node.child_by_field_name("function")
-                if fn_child:
-                    c_text = text_of(fn_child).strip()
-                    if c_text and not c_text.startswith("import") and c_text != "require":
-                        clean_call = re.sub(r'\s+', '', c_text)
-                        if clean_call and clean_call not in ("function", "class"):
-                            call_target_set.add(clean_call)
-                            all_calls.add(clean_call)
-            for child in node.children:
-                extract_calls_from_subtree(child, call_target_set)
+        scope_stack: List[Set[str]] = []
 
         def walk_node(node):
-            nonlocal imports, exports, classes, functions, all_calls
+            nonlocal imports, exports, classes, functions, all_calls, scope_stack
             ntype = node.type
+            pushed_scope = False
 
             # --- Imports ---
             if ntype == "import_statement":
@@ -243,7 +232,6 @@ class TreeSitterASTParser:
 
             # --- Classes ---
             elif ntype == "class_declaration":
-                # Check decorators from self and parent (e.g. export_statement)
                 decorators: List[str] = []
                 for c in node.children:
                     if c.type == "decorator":
@@ -253,11 +241,9 @@ class TreeSitterASTParser:
                         if c.type == "decorator":
                             decorators.append(text_of(c).strip())
 
-                # Class name
                 name_node = node.child_by_field_name("name")
                 class_name = text_of(name_node).strip() if name_node else "AnonymousClass"
 
-                # Heritage (extends, implements)
                 super_class = None
                 implements_list: List[str] = []
                 for child in node.children:
@@ -273,8 +259,6 @@ class TreeSitterASTParser:
                                         implements_list.append(text_of(val))
 
                 methods: List[str] = []
-                class_calls: Set[str] = set()
-
                 body = node.child_by_field_name("body")
                 if body:
                     for item in body.children:
@@ -286,11 +270,11 @@ class TreeSitterASTParser:
                             for mc in item.children:
                                 if mc.type == "decorator":
                                     decorators.append(text_of(mc).strip())
-                            extract_calls_from_subtree(item, class_calls)
 
                 start_line = node.start_point.row + 1
                 end_line = node.end_point.row + 1
 
+                class_calls: Set[str] = set()
                 class_item = {
                     "name": class_name,
                     "kind": "class",
@@ -300,10 +284,13 @@ class TreeSitterASTParser:
                     "implements": implements_list,
                     "methods": methods,
                     "decorators": sorted(list(set(decorators))),
-                    "calls": sorted(list(class_calls)),
+                    "calls": class_calls,
                     "docstring": None
                 }
                 classes.append(class_item)
+                scope_stack.append(class_calls)
+                pushed_scope = True
+
                 if node.parent and node.parent.type == "export_statement":
                     exports.append({"name": class_name, "kind": "class", "line": start_line})
 
@@ -312,7 +299,6 @@ class TreeSitterASTParser:
                 name_node = node.child_by_field_name("name")
                 fn_name = text_of(name_node) if name_node else "anonymous"
 
-                # Extract params (including destructured patterns { key, val })
                 params_list: List[str] = []
                 params_node = node.child_by_field_name("parameters")
                 if params_node:
@@ -327,15 +313,11 @@ class TreeSitterASTParser:
                         if c.type == "decorator":
                             fn_decorators.append(text_of(c).strip())
 
-                fn_calls: Set[str] = set()
-                body_node = node.child_by_field_name("body")
-                if body_node:
-                    extract_calls_from_subtree(body_node, fn_calls)
-
                 is_async = any(text_of(c) == "async" for c in node.children)
                 start_l = node.start_point.row + 1
                 end_l = node.end_point.row + 1
 
+                fn_calls: Set[str] = set()
                 functions.append({
                     "name": fn_name,
                     "kind": "async_function" if is_async else "function",
@@ -343,9 +325,12 @@ class TreeSitterASTParser:
                     "end_line": end_l,
                     "params": params_list,
                     "decorators": sorted(list(set(fn_decorators))),
-                    "calls": sorted(list(fn_calls)),
+                    "calls": fn_calls,
                     "docstring": None
                 })
+                scope_stack.append(fn_calls)
+                pushed_scope = True
+
                 if node.parent and node.parent.type == "export_statement":
                     exports.append({"name": fn_name, "kind": "function", "line": start_l})
 
@@ -363,15 +348,11 @@ class TreeSitterASTParser:
                         p_single = val_node.child_by_field_name("parameter")
                         params_list.append(text_of(p_single))
 
-                    fn_calls: Set[str] = set()
-                    body_node = val_node.child_by_field_name("body")
-                    if body_node:
-                        extract_calls_from_subtree(body_node, fn_calls)
-
                     is_async = any(text_of(c) == "async" for c in val_node.children)
                     start_l = node.start_point.row + 1
                     end_l = node.end_point.row + 1
 
+                    fn_calls: Set[str] = set()
                     functions.append({
                         "name": fn_name,
                         "kind": "async_function" if is_async else "function",
@@ -379,10 +360,12 @@ class TreeSitterASTParser:
                         "end_line": end_l,
                         "params": params_list,
                         "decorators": [],
-                        "calls": sorted(list(fn_calls)),
+                        "calls": fn_calls,
                         "docstring": None
                     })
-                    # Check if grandparent or parent was exported
+                    scope_stack.append(fn_calls)
+                    pushed_scope = True
+
                     p = node.parent
                     if p and p.parent and p.parent.type == "export_statement":
                         exports.append({"name": fn_name, "kind": "function", "line": start_l})
@@ -396,12 +379,25 @@ class TreeSitterASTParser:
                         clean_call = re.sub(r'\s+', '', c_text)
                         if clean_call and clean_call not in ("function", "class"):
                             all_calls.add(clean_call)
+                            if scope_stack:
+                                scope_stack[-1].add(clean_call)
 
-            # Recurse children
+            # Recurse children exactly once
             for child in node.children:
                 walk_node(child)
 
+            if pushed_scope:
+                scope_stack.pop()
+
         walk_node(root_node)
+
+        # Convert calls sets to sorted lists
+        for cls in classes:
+            if isinstance(cls["calls"], set):
+                cls["calls"] = sorted(list(cls["calls"]))
+        for fn in functions:
+            if isinstance(fn["calls"], set):
+                fn["calls"] = sorted(list(fn["calls"]))
 
         # Remove duplicate exports
         seen_exports = set()

@@ -5,6 +5,11 @@ import logging
 from typing import Dict, Any, List, Optional
 from pathlib import Path
 
+# Ensure workspace root is in sys.path
+_repo_root = str(Path(__file__).resolve().parent.parent.parent)
+if _repo_root not in sys.path:
+    sys.path.insert(0, _repo_root)
+
 # Use lightweight MCP protocol server
 try:
     from mcp.server.fastmcp import FastMCP
