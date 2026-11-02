@@ -75,7 +75,14 @@ class RepoDatabaseService:
     def list_repositories(self) -> List[Dict[str, Any]]:
         with self.db.get_connection() as conn:
             cursor = conn.cursor()
-            rows = cursor.execute("SELECT * FROM repositories ORDER BY cloned_at DESC").fetchall()
+            rows = cursor.execute("""
+                SELECT * FROM repositories 
+                WHERE id NOT LIKE 'cli_%' 
+                  AND id NOT LIKE 'test_%' 
+                  AND path IS NOT NULL 
+                  AND path != ''
+                ORDER BY cloned_at DESC
+            """).fetchall()
             return [
                 {
                     "id": r["id"],

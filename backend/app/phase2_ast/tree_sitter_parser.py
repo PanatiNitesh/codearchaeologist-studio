@@ -127,7 +127,7 @@ class TreeSitterASTParser:
 
         scope_stack: List[Set[str]] = []
 
-        def walk_node(node):
+        def walk_node(node, is_exported: bool = False, export_decorators: Optional[List[str]] = None):
             nonlocal imports, exports, classes, functions, all_calls, scope_stack
             ntype = node.type
             pushed_scope = False
@@ -204,6 +204,7 @@ class TreeSitterASTParser:
             elif ntype == "export_statement":
                 raw_text = text_of(node)
                 is_default = any(text_of(c) == "default" for c in node.children)
+                exp_decorators = [text_of(c).strip() for c in node.children if c.type == "decorator"]
 
                 # Export clause: export { a, b }
                 for child in node.children:
@@ -230,16 +231,15 @@ class TreeSitterASTParser:
                         elif child.type == "identifier":
                             exports.append({"name": text_of(child).strip(), "kind": "default", "line": node.start_point.row + 1})
 
+                for child in node.children:
+                    walk_node(child, is_exported=True, export_decorators=exp_decorators)
+                return
+
             # --- Classes ---
             elif ntype == "class_declaration":
-                decorators: List[str] = []
-                for c in node.children:
-                    if c.type == "decorator":
-                        decorators.append(text_of(c).strip())
-                if node.parent and node.parent.type == "export_statement":
-                    for c in node.parent.children:
-                        if c.type == "decorator":
-                            decorators.append(text_of(c).strip())
+                decorators: List[str] = [text_of(c).strip() for c in node.children if c.type == "decorator"]
+                if export_decorators:
+                    decorators.extend(export_decorators)
 
                 name_node = node.child_by_field_name("name")
                 class_name = text_of(name_node).strip() if name_node else "AnonymousClass"
@@ -291,7 +291,7 @@ class TreeSitterASTParser:
                 scope_stack.append(class_calls)
                 pushed_scope = True
 
-                if node.parent and node.parent.type == "export_statement":
+                if is_exported:
                     exports.append({"name": class_name, "kind": "class", "line": start_line})
 
             # --- Function Declarations ---
@@ -304,14 +304,9 @@ class TreeSitterASTParser:
                 if params_node:
                     params_list = _extract_ts_parameters(params_node, text_of)
 
-                fn_decorators: List[str] = []
-                for c in node.children:
-                    if c.type == "decorator":
-                        fn_decorators.append(text_of(c).strip())
-                if node.parent and node.parent.type == "export_statement":
-                    for c in node.parent.children:
-                        if c.type == "decorator":
-                            fn_decorators.append(text_of(c).strip())
+                fn_decorators: List[str] = [text_of(c).strip() for c in node.children if c.type == "decorator"]
+                if export_decorators:
+                    fn_decorators.extend(export_decorators)
 
                 is_async = any(text_of(c) == "async" for c in node.children)
                 start_l = node.start_point.row + 1
@@ -331,44 +326,46 @@ class TreeSitterASTParser:
                 scope_stack.append(fn_calls)
                 pushed_scope = True
 
-                if node.parent and node.parent.type == "export_statement":
+                if is_exported:
                     exports.append({"name": fn_name, "kind": "function", "line": start_l})
 
             # Variable function assignment: const foo = async () => {}
             elif ntype in ("variable_declarator",):
-                val_node = node.child_by_field_name("value")
-                if val_node and val_node.type in ("arrow_function", "function_expression"):
-                    name_node = node.child_by_field_name("name")
-                    fn_name = text_of(name_node) if name_node else "anonymous"
-                    params_list: List[str] = []
-                    params_node = val_node.child_by_field_name("parameters")
-                    if params_node:
-                        params_list = _extract_ts_parameters(params_node, text_of)
-                    elif val_node.child_by_field_name("parameter"):
-                        p_single = val_node.child_by_field_name("parameter")
-                        params_list.append(text_of(p_single))
+                try:
+                    val_node = node.child_by_field_name("value")
+                    if val_node and val_node.type in ("arrow_function", "function_expression"):
+                        name_node = node.child_by_field_name("name")
+                        fn_name = text_of(name_node) if name_node else "anonymous"
+                        params_list: List[str] = []
+                        params_node = val_node.child_by_field_name("parameters")
+                        if params_node:
+                            params_list = _extract_ts_parameters(params_node, text_of)
+                        elif val_node.child_by_field_name("parameter"):
+                            p_single = val_node.child_by_field_name("parameter")
+                            params_list.append(text_of(p_single))
 
-                    is_async = any(text_of(c) == "async" for c in val_node.children)
-                    start_l = node.start_point.row + 1
-                    end_l = node.end_point.row + 1
+                        is_async = any(c.type == "async" for c in val_node.children)
+                        start_l = node.start_point.row + 1
+                        end_l = node.end_point.row + 1
 
-                    fn_calls: Set[str] = set()
-                    functions.append({
-                        "name": fn_name,
-                        "kind": "async_function" if is_async else "function",
-                        "start_line": start_l,
-                        "end_line": end_l,
-                        "params": params_list,
-                        "decorators": [],
-                        "calls": fn_calls,
-                        "docstring": None
-                    })
-                    scope_stack.append(fn_calls)
-                    pushed_scope = True
+                        fn_calls: Set[str] = set()
+                        functions.append({
+                            "name": fn_name,
+                            "kind": "async_function" if is_async else "function",
+                            "start_line": start_l,
+                            "end_line": end_l,
+                            "params": params_list,
+                            "decorators": [],
+                            "calls": fn_calls,
+                            "docstring": None
+                        })
+                        scope_stack.append(fn_calls)
+                        pushed_scope = True
 
-                    p = node.parent
-                    if p and p.parent and p.parent.type == "export_statement":
-                        exports.append({"name": fn_name, "kind": "function", "line": start_l})
+                        if is_exported:
+                            exports.append({"name": fn_name, "kind": "function", "line": start_l})
+                except Exception:
+                    pass
 
             # Top-level / general call expressions
             elif ntype == "call_expression":
@@ -382,9 +379,10 @@ class TreeSitterASTParser:
                             if scope_stack:
                                 scope_stack[-1].add(clean_call)
 
-            # Recurse children exactly once
+            # Recurse children exactly once (resetting is_exported inside function or class scopes)
+            next_exported = is_exported if ntype in ("lexical_declaration", "variable_declaration") else False
             for child in node.children:
-                walk_node(child)
+                walk_node(child, is_exported=next_exported, export_decorators=export_decorators if next_exported else None)
 
             if pushed_scope:
                 scope_stack.pop()
@@ -681,10 +679,10 @@ def _extract_ts_parameters(params_node, text_of_fn) -> List[str]:
         if p.type in ("(", ")", ",", ":", ";"):
             continue
 
-        def find_param_names(node):
+        def find_param_names(node, parent_type: str = ""):
             if node.type in ("identifier", "shorthand_property_identifier", "shorthand_property_identifier_pattern"):
                 # Avoid type annotations and keywords
-                if node.parent and node.parent.type in ("type_annotation", "generic_type", "type_reference"):
+                if parent_type in ("type_annotation", "generic_type", "type_reference"):
                     return
                 val = text_of_fn(node).strip()
                 if val and val not in params and val not in ("type", "function", "const", "let", "var", "async"):
@@ -692,7 +690,7 @@ def _extract_ts_parameters(params_node, text_of_fn) -> List[str]:
                 return
             for c in node.children:
                 if c.type != "type_annotation":
-                    find_param_names(c)
+                    find_param_names(c, node.type)
 
-        find_param_names(p)
+        find_param_names(p, p.type)
     return params

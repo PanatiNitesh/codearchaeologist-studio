@@ -104,7 +104,7 @@ def get_client_hash(request: Request, visitor_id: Optional[str] = None) -> str:
     return "vis_" + hashlib.sha256(raw.encode()).hexdigest()[:12]
 
 tasks_status: Dict[str, Dict[str, Any]] = {}
-_pipeline_load_lock = threading.Lock()
+_pipeline_load_lock = threading.RLock()
 
 def set_active_pipeline(repo_id: str, pipeline: CodeArchaeologistPipeline):
     """
@@ -213,7 +213,12 @@ def get_or_load_pipeline(repo_id: str, force_reanalyze: bool = False) -> CodeArc
                 set_active_pipeline(sample_repo_id, pipeline)
                 return pipeline
 
-        pipeline = CodeArchaeologistPipeline(repo_id, repo_info["path"])
+        repo_path = repo_info.get("path") or ""
+        if not repo_path or not Path(repo_path).exists():
+            logger.warning(f"Repository path for '{repo_id}' does not exist on disk ('{repo_path}'). Falling back to sample enterprise repository.")
+            return get_or_load_pipeline("sample_enterprise_ecommerce", force_reanalyze=False)
+
+        pipeline = CodeArchaeologistPipeline(repo_id, repo_path)
         if not force_reanalyze:
             loaded = pipeline.load_from_db()
             if loaded:
