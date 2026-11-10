@@ -22,3 +22,4 @@ def test_api_multi_repo_benchmark_endpoint():
     assert data["repositories_evaluated"] >= 1
     assert "macro_metrics" in data
     assert "summary" in data
+
