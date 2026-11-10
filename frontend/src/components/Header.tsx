@@ -73,12 +73,12 @@ export const Header: React.FC<HeaderProps> = ({
 
   const currentRepo = repositories.find(r => r.id === currentRepoId);
 
-  const navItems: { id: AppPage; label: string; icon: React.ComponentType<any>; badge?: string }[] = [
+  const navItems: { id: AppPage; label: string; icon: React.ComponentType<any> }[] = [
     { id: 'overview', label: 'Overview', icon: LayoutDashboard },
     { id: 'architecture', label: 'Topology', icon: Compass },
     { id: 'blast-radius', label: 'Blast Radius', icon: Flame },
-    { id: 'systemdna', label: 'SystemDNA', icon: Cpu, badge: 'Preview' },
-    { id: 'handover', label: 'Handover', icon: Users, badge: 'Continuity' },
+    { id: 'systemdna', label: 'SystemDNA', icon: Cpu },
+    { id: 'handover', label: 'Handover', icon: Users },
     { id: 'archaeology', label: 'Archaeology', icon: History },
     { id: 'assistant', label: 'Evidence AI', icon: Bot },
     { id: 'evaluation', label: 'Benchmarks', icon: BarChart2 }
@@ -192,76 +192,73 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <header style={{ background: 'var(--bg-surface)', borderBottom: '1px solid var(--border-hairline)', position: 'sticky', top: 0, zIndex: 50, flexShrink: 0 }} className="select-none">
       {/* ── Single unified nav bar ── */}
-      <div style={{ height: 'var(--nav-height, 52px)', padding: '0 14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-        {/* ── Logo ── */}
-        <div
-          onClick={() => onNavigate('overview')}
-          className="flex items-center gap-2 cursor-pointer flex-shrink-0"
-          title="CodeArchaeologist Pro"
-        >
-          <div style={{
-            width: 28, height: 28, borderRadius: 7,
-            background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: 'var(--accent-glow)', flexShrink: 0
-          }}>
-            <Layers style={{ width: 14, height: 14, color: '#fff' }} />
-          </div>
-          <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '-0.03em', color: 'var(--text-primary)', whiteSpace: 'nowrap' }}>
-            CodeArchaeologist
-          </span>
-          <span style={{
-            fontSize: 9, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase',
-            color: 'var(--accent-primary)', padding: '2px 6px', borderRadius: 4,
-            background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.25)'
-          }}>Pro</span>
-        </div>
-
-        {/* ── Divider ── */}
-        <div style={{ width: 1, height: 20, background: 'var(--border-hairline)', flexShrink: 0, marginLeft: 4, marginRight: 4 }} />
-
-        {/* ── Repo Selector ── */}
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: 6, padding: '5px 10px',
-          borderRadius: 7, border: '1px solid var(--border-hairline)',
-          background: 'var(--bg-card)', cursor: 'pointer', flexShrink: 0,
-          transition: 'all 0.15s ease'
-        }} className="hover:border-[var(--border-subtle)]">
-          <FolderGit2 style={{ width: 13, height: 13, color: 'var(--accent-primary)', flexShrink: 0 }} />
-          <select
-            value={currentRepoId}
-            onChange={(e) => onSelectRepo(e.target.value)}
-            style={{ background: 'transparent', border: 'none', fontSize: 11.5, fontWeight: 600, color: 'var(--text-primary)', outline: 'none', cursor: 'pointer', fontFamily: 'JetBrains Mono, monospace', maxWidth: 160 }}
-            disabled={loading}
+      <div style={{ height: 'var(--nav-height, 52px)', padding: '0 10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '6px' }}>
+        {/* ── Left: Logo & Repo ── */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+          <div
+            onClick={() => onNavigate('overview')}
+            className="flex items-center gap-1.5 cursor-pointer flex-shrink-0"
+            title="CodeArchaeologist Pro"
           >
-            {repositories.map(r => (
-              <option key={r.id} value={r.id} style={{ background: 'var(--bg-surface)', color: 'var(--text-primary)' }}>
-                {r.name}
-              </option>
-            ))}
-          </select>
-          <ChevronDown style={{ width: 11, height: 11, color: 'var(--text-muted)', flexShrink: 0 }} />
+            <div style={{
+              width: 26, height: 26, borderRadius: 6,
+              background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: 'var(--accent-glow)', flexShrink: 0
+            }}>
+              <Layers style={{ width: 13, height: 13, color: '#fff' }} />
+            </div>
+            <span style={{ fontSize: 12.5, fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--text-primary)', whiteSpace: 'nowrap' }}>
+              CodeArchaeologist
+            </span>
+          </div>
+
+          {/* ── Divider ── */}
+          <div style={{ width: 1, height: 18, background: 'var(--border-hairline)', flexShrink: 0, marginLeft: 2, marginRight: 2 }} />
+
+          {/* ── Repo Selector ── */}
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 5, padding: '4px 8px',
+            borderRadius: 7, border: '1px solid var(--border-hairline)',
+            background: 'var(--bg-card)', cursor: 'pointer', flexShrink: 0,
+            transition: 'all 0.15s ease'
+          }} className="hover:border-[var(--border-subtle)]">
+            <FolderGit2 style={{ width: 12.5, height: 12.5, color: 'var(--accent-primary)', flexShrink: 0 }} />
+            <select
+              value={currentRepoId}
+              onChange={(e) => onSelectRepo(e.target.value)}
+              style={{
+                background: 'transparent', border: 'none', fontSize: 11, fontWeight: 600,
+                color: 'var(--text-primary)', outline: 'none', cursor: 'pointer',
+                fontFamily: 'JetBrains Mono, monospace', maxWidth: 115, textOverflow: 'ellipsis'
+              }}
+              disabled={loading}
+            >
+              {repositories.map(r => (
+                <option key={r.id} value={r.id} style={{ background: 'var(--bg-surface)', color: 'var(--text-primary)' }}>
+                  {r.name}
+                </option>
+              ))}
+            </select>
+            <ChevronDown style={{ width: 10, height: 10, color: 'var(--text-muted)', flexShrink: 0 }} />
+          </div>
+
+          {currentRepo && (
+            <div className="hidden 2xl:flex items-center gap-1" style={{ fontSize: 11, fontFamily: 'JetBrains Mono, monospace', color: 'var(--text-muted)' }}>
+              <GitBranch style={{ width: 11, height: 11 }} />
+              <span>{currentRepo.default_branch || 'main'}</span>
+              <button onClick={copyRepoPath} style={{ marginLeft: 3, cursor: 'pointer', color: 'var(--text-muted)', background: 'none', border: 'none', display: 'flex', alignItems: 'center' }}>
+                {copied ? <Check style={{ width: 11, height: 11, color: 'var(--accent-emerald)' }} /> : <Copy style={{ width: 11, height: 11 }} />}
+              </button>
+            </div>
+          )}
         </div>
 
-        {currentRepo && (
-          <div className="hidden xl:flex items-center gap-1" style={{ fontSize: 11, fontFamily: 'JetBrains Mono, monospace', color: 'var(--text-muted)' }}>
-            <GitBranch style={{ width: 11, height: 11 }} />
-            <span>{currentRepo.default_branch || 'main'}</span>
-            <button onClick={copyRepoPath} style={{ marginLeft: 3, cursor: 'pointer', color: 'var(--text-muted)', background: 'none', border: 'none', display: 'flex', alignItems: 'center' }}>
-              {copied ? <Check style={{ width: 11, height: 11, color: 'var(--accent-emerald)' }} /> : <Copy style={{ width: 11, height: 11 }} />}
-            </button>
-          </div>
-        )}
-
-        {/* ── Nav Tabs (scrollable center) ── */}
+        {/* ── Center: Nav Tabs ── */}
         <nav style={{
-          display: 'flex', alignItems: 'center', gap: 1, flex: 1,
-          overflowX: 'auto', overflowY: 'hidden',
-          marginLeft: 6, marginRight: 6,
-          scrollbarWidth: 'none', /* Firefox */
-        }}
-          className="hide-scrollbar"
-        >
+          display: 'flex', alignItems: 'center', gap: 2, flexShrink: 0,
+          margin: '0 4px',
+        }}>
           {navItems.map(item => {
             const Icon = item.icon;
             const isActive = activePage === item.id;
@@ -270,8 +267,8 @@ export const Header: React.FC<HeaderProps> = ({
                 key={item.id}
                 onClick={() => onNavigate(item.id)}
                 style={{
-                  display: 'flex', alignItems: 'center', gap: 4,
-                  padding: '5px 8px', borderRadius: 7, fontSize: 11.5, fontWeight: isActive ? 600 : 500,
+                  display: 'flex', alignItems: 'center', gap: 3.5,
+                  padding: '4px 7px', borderRadius: 6, fontSize: 11.5, fontWeight: isActive ? 600 : 500,
                   color: isActive ? 'var(--text-primary)' : 'var(--text-tertiary)',
                   background: isActive ? 'rgba(99,102,241,0.12)' : 'transparent',
                   border: isActive ? '1px solid rgba(99,102,241,0.22)' : '1px solid transparent',
@@ -282,25 +279,17 @@ export const Header: React.FC<HeaderProps> = ({
                 onMouseEnter={e => { if (!isActive) { (e.currentTarget as HTMLElement).style.color = 'var(--text-secondary)'; (e.currentTarget as HTMLElement).style.background = 'var(--bg-card)'; } }}
                 onMouseLeave={e => { if (!isActive) { (e.currentTarget as HTMLElement).style.color = 'var(--text-tertiary)'; (e.currentTarget as HTMLElement).style.background = 'transparent'; } }}
               >
-                <Icon style={{ width: 13, height: 13, flexShrink: 0 }} />
+                <Icon style={{ width: 12.5, height: 12.5, flexShrink: 0 }} />
                 <span>{item.label}</span>
-                {item.badge && (
-                  <span style={{
-                    fontSize: 8.5, fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase',
-                    color: isActive ? 'var(--accent-primary)' : 'var(--text-muted)',
-                    background: isActive ? 'rgba(99,102,241,0.15)' : 'var(--bg-card)',
-                    border: '1px solid var(--border-hairline)', padding: '1px 5px', borderRadius: 4
-                  }}>{item.badge}</span>
-                )}
               </button>
             );
           })}
         </nav>
 
         {/* ── Right Actions ── */}
-        <div className="flex items-center gap-2" style={{ flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '5px', flexShrink: 0 }}>
           {currentRepo?.stats && (
-            <div className="hidden xl:flex items-center gap-1.5" style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10.5 }}>
+            <div className="hidden 2xl:flex items-center gap-1.5" style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10.5 }}>
               <div style={{ padding: '2px 8px', borderRadius: 5, background: 'rgba(16,185,129,0.12)', color: 'var(--accent-emerald)', border: '1px solid rgba(16,185,129,0.25)', fontWeight: 600 }}>
                 F1 {(currentRepo.stats.arch_f1 ?? 1.0).toFixed(2)}
               </div>
@@ -315,16 +304,16 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               onClick={() => setShowThemeMenu(!showThemeMenu)}
               style={{
-                display: 'flex', alignItems: 'center', gap: 5, padding: '5px 10px',
+                display: 'flex', alignItems: 'center', gap: 4, padding: '4px 8px',
                 borderRadius: 7, border: '1px solid var(--border-hairline)',
-                background: 'var(--bg-card)', cursor: 'pointer', fontSize: 12, fontWeight: 500,
+                background: 'var(--bg-card)', cursor: 'pointer', fontSize: 11.5, fontWeight: 500,
                 color: 'var(--text-secondary)', transition: 'all 0.15s ease'
               }}
-              title="Change UI Theme"
+              title={`Theme: ${getThemeLabel(currentTheme)}`}
             >
-              <Palette style={{ width: 13, height: 13 }} />
-              <span className="hidden md:inline" style={{ fontSize: 12 }}>{getThemeLabel(currentTheme)}</span>
-              <ChevronDown style={{ width: 11, height: 11, color: 'var(--text-muted)' }} />
+              <Palette style={{ width: 12.5, height: 12.5 }} />
+              <span className="hidden 2xl:inline" style={{ fontSize: 11.5 }}>{getThemeLabel(currentTheme)}</span>
+              <ChevronDown style={{ width: 10, height: 10, color: 'var(--text-muted)' }} />
             </button>
 
             {showThemeMenu && (
@@ -371,30 +360,30 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             onClick={onOpenAnalytics}
             style={{
-              display: 'flex', alignItems: 'center', gap: 5, padding: '5px 10px',
+              display: 'flex', alignItems: 'center', gap: 4, padding: '4px 8px',
               borderRadius: 7, border: '1px solid var(--border-hairline)',
-              background: 'var(--bg-card)', cursor: 'pointer', fontSize: 12, fontWeight: 500,
+              background: 'var(--bg-card)', cursor: 'pointer', fontSize: 11.5, fontWeight: 500,
               color: 'var(--text-secondary)', transition: 'all 0.15s ease', whiteSpace: 'nowrap'
             }}
             title="Live Usage Analytics"
           >
-            <Activity style={{ width: 13, height: 13, color: 'var(--accent-primary)' }} />
-            <span className="hidden lg:inline">Analytics</span>
+            <Activity style={{ width: 12.5, height: 12.5, color: 'var(--accent-primary)' }} />
+            <span className="hidden 2xl:inline">Analytics</span>
           </button>
 
           <button
             onClick={onLoadSample}
             disabled={loading}
             style={{
-              display: 'flex', alignItems: 'center', gap: 5, padding: '5px 10px',
+              display: 'flex', alignItems: 'center', gap: 4, padding: '4px 8px',
               borderRadius: 7, border: '1px solid var(--border-hairline)',
-              background: 'var(--bg-card)', cursor: 'pointer', fontSize: 12, fontWeight: 500,
+              background: 'var(--bg-card)', cursor: 'pointer', fontSize: 11.5, fontWeight: 500,
               color: 'var(--text-secondary)', transition: 'all 0.15s ease', whiteSpace: 'nowrap'
             }}
-            title="Reload Sample"
+            title="Reload Sample Codebase"
           >
-            <Sparkles style={{ width: 13, height: 13, color: 'var(--accent-amber)' }} />
-            <span className="hidden md:inline">Sample</span>
+            <Sparkles style={{ width: 12.5, height: 12.5, color: 'var(--accent-amber)' }} />
+            <span className="hidden 2xl:inline">Sample</span>
           </button>
 
           {/* ── Ingest Repo Button ── */}
@@ -403,15 +392,15 @@ export const Header: React.FC<HeaderProps> = ({
               onClick={() => setShowIngestModal(!showIngestModal)}
               disabled={loading}
               style={{
-                display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px',
-                borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 12.5, fontWeight: 700,
+                display: 'flex', alignItems: 'center', gap: 4, padding: '4px 10px',
+                borderRadius: 7, border: 'none', cursor: 'pointer', fontSize: 11.5, fontWeight: 600,
                 color: '#fff', background: 'var(--accent-primary)',
                 boxShadow: 'var(--accent-glow)', transition: 'all 0.15s ease',
                 opacity: loading ? 0.6 : 1, whiteSpace: 'nowrap'
               }}
             >
-              <Plus style={{ width: 13, height: 13 }} />
-              <span>Ingest Repo</span>
+              <Plus style={{ width: 12, height: 12 }} />
+              <span>Ingest</span>
             </button>
 
             {showIngestModal && (
