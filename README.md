@@ -54,32 +54,6 @@
 - [⚙️ Configuration & Environment Variables](#️-configuration--environment-variables)
 - [📄 License](#-license)
 
----
-
-## 🎯 Challenge Track & Strategic Fit
-
-### Primary Track: **Artificial Intelligence and Machine Learning**
-### Secondary Track: **Data Science and Advanced Analytics**
-
-### Why These Tracks?
-
-| Track | Fit | CodeArchaeologist Capability |
-| :--- | :---: | :--- |
-| **Artificial Intelligence & Machine Learning** | ✅ **Primary** | Systematic edit inference (LASE / Getafix / Refazer), Daikon-style invariant mining, ML-calibrated blast radius predictor, RAG grounding verifier |
-| **Data Science & Advanced Analytics** | ✅ **Secondary** | Empirical precision matrices, Jaccard co-change graph analytics, multi-repo benchmarks, Precision@k temporal forecasting |
-| **Generative AI & Responsible AI** | ⚠️ Partial | Grounding verifier eliminates hallucinations — 100% citation-verified answers — but the tool goes far beyond GenAI wrappers |
-| **Operations Research & Decision Intelligence** | ⚠️ Partial | Blast radius risk scoring and topological migration sequencing fit decision intelligence, but scope is broader |
-
-### Strategic Justification
-
-| Criterion | CodeArchaeologist Approach |
-| :--- | :--- |
-| **ML / AI Core** | Systematic edit inference adapts LASE, Getafix, and Refazer research; invariant mining adapts Daikon — both are peer-reviewed AI/ML methodologies |
-| **Data-Driven, Not Speculative** | Empirical precision matrices, Jaccard co-change similarity, Precision@k temporal forecasting — no synthetic floors or hardcoded scores |
-| **Beyond LLM Wrappers** | Compiler-grade Tree-Sitter AST across 5 languages; call-graph traversal for broken contract detection; real Git diff analysis |
-| **Reproducible Benchmarks** | HalfDone-Bench and multi-repository blast radius evaluation with labeled ground-truth commits across 3 production repos |
-
----
 
 ## 📌 Executive Problem & Breakthrough
 
