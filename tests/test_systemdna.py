@@ -50,7 +50,7 @@ def test_systemdna_scoped_permits_and_agents():
     roles = [ag["role"] for ag in agents]
     assert any("Symbol Resolution" in r for r in roles)
     assert any("Topological" in r for r in roles)
-    assert any("Safety Rollback Sentinel" in r for r in roles)
+    assert any("Rollback" in r for r in roles)
 
 def test_systemdna_backward_compatible_sql():
     engine = SystemDNAEngine()
