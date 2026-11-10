@@ -62,10 +62,10 @@ Generated: ${new Date().toISOString()}
 - Architecture Discovery F1: ${(archF1 * 100).toFixed(1)}%
 - Historical Blast Impact F1: ${(blastF1 * 100).toFixed(1)}%
 
-## Modernization Readiness:
-- SystemDNA Compiler Precision: 100% (Zero false-alarm noise)
-- Multi-Wave Rollback Safety: Active (30-second automated sentinel)
-- Enterprise Fleet Estate: 1,000 Applications Tiered (540 Golden, 320 Gray, 140 Red)
+## Modernization & Shift Handover Readiness:
+- AST Compiler Precision Matrix: 85.7% Measured Empirical Signal vs Grep
+- Autonomous Shift Handover: Active (WIP Git Diff + Systematic Edit Inference)
+- Enterprise Fleet Estate: 1,000 Application Migration Plan Preview
 `;
     const blob = new Blob([report], { type: 'text/markdown' });
     const url = URL.createObjectURL(blob);
@@ -349,7 +349,7 @@ Generated: ${new Date().toISOString()}
               Hybrid Dense + BM25 RAG assistant enforcing verifiable source citations with clickable line numbers and exact Git commit hashes.
             </p>
             <div className="text-[11px] font-mono text-indigo-600 dark:text-indigo-400 pt-1">
-              Strict Verification • Zero Hallucinations
+              Strict Evidence Grounding • Verifiable Citations
             </div>
           </div>
         </div>

@@ -257,7 +257,7 @@ class SystemDNAEngine:
             {
                 "agent_id": "agent-inspector-gate",
                 "name": "Inspector & Governance Gate",
-                "role": "Type Checker & Safety Rollback Sentinel",
+                "role": "Type Checker & Rollback Guard",
                 "target_scope": "Full Diff Verification",
                 "permit_type": "GOVERNANCE_GATE",
                 "status": "PASSED",

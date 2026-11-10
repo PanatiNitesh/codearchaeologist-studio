@@ -381,7 +381,7 @@ export const SystemDNAModal: React.FC<SystemDNAModalProps> = ({ isOpen, onClose,
                 <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 flex items-center gap-3 text-xs text-rose-200 animate-pulse">
                   <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
                   <span>
-                    <strong>Safety Sentinel Triggered:</strong> Simulated compilation mismatch in Wave 3 route signature. Scoped fixer reverted within 0.8s. Database and service state restored cleanly to prior milestone.
+                    <strong>Safety Policy Triggered:</strong> Simulated compilation mismatch in Wave 3 route signature. Scoped fixer reverted within 0.8s. Database and service state restored cleanly to prior milestone.
                   </span>
                 </div>
               )}
@@ -527,9 +527,9 @@ export const SystemDNAModal: React.FC<SystemDNAModalProps> = ({ isOpen, onClose,
                 <div className="flex items-center justify-between">
                   <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
                     <Cloud className="w-3.5 h-3.5 text-indigo-400" />
-                    Zero-Downtime Traffic Cutover & Canary Telemetry Sentinel
+                    Zero-Downtime Traffic Cutover & Canary Telemetry Guard
                   </h4>
-                  <span className="text-[11px] text-emerald-400 font-mono">Auto-Rollback Guard: 30s</span>
+                  <span className="text-[11px] text-emerald-400 font-mono">Auto-Rollback Verification Active</span>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">

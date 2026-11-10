@@ -398,7 +398,7 @@ export const SystemDNAPage: React.FC<SystemDNAPageProps> = ({ repoId, onAskAI })
             <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 flex items-center gap-3 text-xs text-rose-800 animate-pulse">
               <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
               <span>
-                <strong>Safety Sentinel Triggered:</strong> Simulated compilation mismatch in Wave 3 route signature. Scoped fixer reverted within 0.8s. Database and service state restored cleanly to prior milestone.
+                <strong>Safety Policy Triggered:</strong> Simulated compilation mismatch in Wave 3 route signature. Scoped fixer reverted within 0.8s. Database and service state restored cleanly to prior milestone.
               </span>
             </div>
           )}
@@ -539,9 +539,9 @@ export const SystemDNAPage: React.FC<SystemDNAPageProps> = ({ repoId, onAskAI })
             <div className="flex items-center justify-between border-b border-[var(--border-hairline)] pb-2">
               <h4 className="text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider flex items-center gap-2">
                 <Cloud className="w-3.5 h-3.5 text-indigo-600" />
-                Zero-Downtime Traffic Cutover & Canary Sentinel
+                Zero-Downtime Traffic Cutover & Canary Verification
               </h4>
-              <span className="text-[11px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 font-mono font-semibold">Auto-Rollback Guard: 30s</span>
+              <span className="text-[11px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 font-mono font-semibold">Auto-Rollback Verification Active</span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">

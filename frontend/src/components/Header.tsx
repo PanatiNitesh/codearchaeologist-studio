@@ -100,11 +100,13 @@ export const Header: React.FC<HeaderProps> = ({
 
   const startTaskPolling = (taskId: string, fallbackUrl?: string) => {
     let attempts = 0;
+    let consecutiveErrors = 0;
     let pollInterval: any = null;
     pollInterval = setInterval(async () => {
       attempts++;
       try {
         const statusData = await api.getTaskStatus(taskId);
+        consecutiveErrors = 0;
         if (statusData.progress) {
           setIngestStatusText(statusData.progress);
         }
@@ -132,7 +134,14 @@ export const Header: React.FC<HeaderProps> = ({
           alert('Ingestion is taking longer than expected. The task is continuing in the background—please check back shortly or refresh the page.');
         }
       } catch (err) {
+        consecutiveErrors++;
         console.warn('Poll error (retrying):', err);
+        if (consecutiveErrors >= 8) {
+          if (pollInterval) clearInterval(pollInterval);
+          setIngestLoading(false);
+          setIngestStatusText('');
+          console.warn('Polling halted after consecutive network connection errors.');
+        }
       }
     }, 1500);
   };

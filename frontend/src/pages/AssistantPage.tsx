@@ -138,7 +138,7 @@ export const AssistantPage: React.FC<AssistantPageProps> = ({
           )}
           <div className="hidden sm:flex items-center gap-1.5 text-xs text-indigo-700 bg-indigo-50 dark:bg-cyan-950/50 dark:text-cyan-400 font-mono px-3 py-1.5 rounded-lg border border-indigo-200 dark:border-cyan-800/50 font-semibold">
             <ShieldCheck className="w-4 h-4" />
-            <span>Zero Hallucinations</span>
+            <span>Fact-Checked & Grounded</span>
           </div>
         </div>
       </div>
