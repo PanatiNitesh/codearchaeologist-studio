@@ -75,10 +75,10 @@ export const Header: React.FC<HeaderProps> = ({
 
   const navItems: { id: AppPage; label: string; icon: React.ComponentType<any>; badge?: string }[] = [
     { id: 'overview', label: 'Overview', icon: LayoutDashboard },
-    { id: 'architecture', label: 'Topology Graph', icon: Compass },
+    { id: 'architecture', label: 'Topology', icon: Compass },
     { id: 'blast-radius', label: 'Blast Radius', icon: Flame },
-    { id: 'systemdna', label: 'SystemDNA', icon: Cpu, badge: 'ForgeHacks' },
-    { id: 'handover', label: 'Shift Handover', icon: Users, badge: 'Continuity' },
+    { id: 'systemdna', label: 'SystemDNA', icon: Cpu, badge: 'Preview' },
+    { id: 'handover', label: 'Handover', icon: Users, badge: 'Continuity' },
     { id: 'archaeology', label: 'Archaeology', icon: History },
     { id: 'assistant', label: 'Evidence AI', icon: Bot },
     { id: 'evaluation', label: 'Benchmarks', icon: BarChart2 }
@@ -254,7 +254,14 @@ export const Header: React.FC<HeaderProps> = ({
         )}
 
         {/* ── Nav Tabs (scrollable center) ── */}
-        <nav style={{ display: 'flex', alignItems: 'center', gap: 2, flex: 1, overflow: 'hidden', marginLeft: 8, marginRight: 8 }}>
+        <nav style={{
+          display: 'flex', alignItems: 'center', gap: 1, flex: 1,
+          overflowX: 'auto', overflowY: 'hidden',
+          marginLeft: 6, marginRight: 6,
+          scrollbarWidth: 'none', /* Firefox */
+        }}
+          className="hide-scrollbar"
+        >
           {navItems.map(item => {
             const Icon = item.icon;
             const isActive = activePage === item.id;
@@ -263,8 +270,8 @@ export const Header: React.FC<HeaderProps> = ({
                 key={item.id}
                 onClick={() => onNavigate(item.id)}
                 style={{
-                  display: 'flex', alignItems: 'center', gap: 5,
-                  padding: '5px 10px', borderRadius: 7, fontSize: 12, fontWeight: isActive ? 600 : 500,
+                  display: 'flex', alignItems: 'center', gap: 4,
+                  padding: '5px 8px', borderRadius: 7, fontSize: 11.5, fontWeight: isActive ? 600 : 500,
                   color: isActive ? 'var(--text-primary)' : 'var(--text-tertiary)',
                   background: isActive ? 'rgba(99,102,241,0.12)' : 'transparent',
                   border: isActive ? '1px solid rgba(99,102,241,0.22)' : '1px solid transparent',
