@@ -354,6 +354,11 @@ export const api = {
     return safeJson(res);
   },
 
+  async getMultiRepoBenchmark(commitsPerRepo: number = 4): Promise<any> {
+    const res = await fetch(`${API_BASE}/benchmark/multi-repo?commits_per_repo=${commitsPerRepo}`);
+    return safeJson(res);
+  },
+
   async trackEvent(eventType: string, repoId?: string, details?: any): Promise<void> {
     try {
       await fetch(`${API_BASE}/analytics/track`, {

@@ -711,6 +711,17 @@ def get_precision_matrix(repo_id: str, target_symbol: str = Query("customer_id")
     evaluator = PrecisionMatrixEvaluator(pipeline.files_data)
     return evaluator.compute_precision_matrix(target_symbol)
 
+@app.get("/api/benchmark/multi-repo")
+@app.get("/api/repo/{repo_id}/benchmark/multi-repo")
+def run_multi_repo_benchmark(repo_id: Optional[str] = None, commits_per_repo: int = Query(4)):
+    """
+    Empirical multi-repository blast radius evaluation across 3 public/local codebases.
+    Reports measured precision, recall, and F1 on historical co-change commits.
+    """
+    from backend.app.phase7_evaluation.multi_repo_benchmark import MultiRepoBlastBenchmark
+    bench = MultiRepoBlastBenchmark()
+    return bench.run_benchmark(max_commits_per_repo=commits_per_repo)
+
 @app.get("/{full_path:path}")
 def catch_all(full_path: str):
     if full_path.startswith("api"):

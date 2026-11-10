@@ -98,6 +98,21 @@ def cmd_benchmark(args):
     print(f"Mean F1 Score: {res['mean_f1_score']}")
     print(f"Success Rate: {res['success_rate_pct']}%\n")
 
+def cmd_multi_repo(args):
+    from backend.app.phase7_evaluation.multi_repo_benchmark import MultiRepoBlastBenchmark
+    bench = MultiRepoBlastBenchmark()
+    res = bench.run_benchmark(max_commits_per_repo=args.commits)
+    print("\n🌐 MULTI-REPOSITORY BLAST RADIUS BENCHMARK REPORT:")
+    print(f"Repositories Evaluated: {res['repositories_evaluated']}")
+    print(f"Total Historical Commits: {res['total_commits_evaluated']}")
+    print(f"Macro Precision: {res['macro_metrics']['precision']:.1%}")
+    print(f"Macro Recall: {res['macro_metrics']['recall']:.1%}")
+    print(f"Macro F1 Score: {res['macro_metrics']['f1_score']:.3f}\n")
+    print("Breakdown per repository:")
+    for r in res["per_repository"]:
+        print(f"  - {r['repo_name']} ({r['language']}): P={r['precision']:.1%}, R={r['recall']:.1%}, F1={r['f1_score']:.3f} on {r['commits_evaluated']} commits")
+    print()
+
 def main():
     parser = argparse.ArgumentParser(
         prog="ca",
@@ -124,6 +139,11 @@ def main():
     p_bench.add_argument("--repo", default=".", help="Repository root directory")
     p_bench.add_argument("--tasks", type=int, default=5, help="Maximum benchmark tasks")
     p_bench.set_defaults(func=cmd_benchmark)
+
+    # multi-repo benchmark command
+    p_multi = subparsers.add_parser("multi-repo", help="Run multi-repository blast radius evaluation across 3+ codebases")
+    p_multi.add_argument("--commits", type=int, default=4, help="Commits per repository")
+    p_multi.set_defaults(func=cmd_multi_repo)
 
     args = parser.parse_args()
     try:
