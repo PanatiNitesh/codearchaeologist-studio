@@ -30,7 +30,7 @@
 
 ## 📑 Table of Contents
 
-- [🏆 DATANOVA 2026: Track Selection & Strategic Fit](#-datanova-2026-global-data-thon-track-selection)
+- [🎯 Challenge Track & Strategic Fit](#-challenge-track--strategic-fit)
 - [📌 Executive Problem & Breakthrough](#-executive-problem--breakthrough)
 - [🔬 Theoretical Foundations (LASE · Getafix · Refazer · Daikon)](#-theoretical-foundations--systematic-edit-research)
 - [✨ Core Capabilities & Innovations](#-core-capabilities--innovations)
@@ -56,20 +56,28 @@
 
 ---
 
-## 🏆 DATANOVA 2026 Global Data-Thon: Track Selection
+## 🎯 Challenge Track & Strategic Fit
 
-### Best Fit: **Data Science and Advanced Analytics**
-*(Alternative strong co-track: **Artificial Intelligence and Machine Learning**)*
+### Primary Track: **Artificial Intelligence and Machine Learning**
+### Secondary Track: **Data Science and Advanced Analytics**
+
+### Why These Tracks?
+
+| Track | Fit | CodeArchaeologist Capability |
+| :--- | :---: | :--- |
+| **Artificial Intelligence & Machine Learning** | ✅ **Primary** | Systematic edit inference (LASE / Getafix / Refazer), Daikon-style invariant mining, ML-calibrated blast radius predictor, RAG grounding verifier |
+| **Data Science & Advanced Analytics** | ✅ **Secondary** | Empirical precision matrices, Jaccard co-change graph analytics, multi-repo benchmarks, Precision@k temporal forecasting |
+| **Generative AI & Responsible AI** | ⚠️ Partial | Grounding verifier eliminates hallucinations — 100% citation-verified answers — but the tool goes far beyond GenAI wrappers |
+| **Operations Research & Decision Intelligence** | ⚠️ Partial | Blast radius risk scoring and topological migration sequencing fit decision intelligence, but scope is broader |
 
 ### Strategic Justification
 
 | Criterion | CodeArchaeologist Approach |
 | :--- | :--- |
-| **Data Source** | Entire repository history modelled as an evolving multidimensional dataset — not raw LLM tokens |
-| **Temporal Mining** | Association Rule Mining on commit co-change logs (support, confidence, Jaccard similarity) |
-| **Graph Analytics** | Directed multigraph analysis over AST nodes `V` and semantic edge types `E` |
-| **Developer Networks** | Author churn timelines, knowledge-loss matrices, and temporal bus-factor entropy |
-| **Differentiation** | Daikon-style invariant mining + Precision@k forecasting + empirical precision matrices — not a chatbot wrapper |
+| **ML / AI Core** | Systematic edit inference adapts LASE, Getafix, and Refazer research; invariant mining adapts Daikon — both are peer-reviewed AI/ML methodologies |
+| **Data-Driven, Not Speculative** | Empirical precision matrices, Jaccard co-change similarity, Precision@k temporal forecasting — no synthetic floors or hardcoded scores |
+| **Beyond LLM Wrappers** | Compiler-grade Tree-Sitter AST across 5 languages; call-graph traversal for broken contract detection; real Git diff analysis |
+| **Reproducible Benchmarks** | HalfDone-Bench and multi-repository blast radius evaluation with labeled ground-truth commits across 3 production repos |
 
 ---
 
@@ -816,9 +824,9 @@ Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for details.
 
 <div align="center">
 
-**Built for DATANOVA 2026 Global Data-Thon**
+**CodeArchaeologist Studio — Where compiler science meets software archaeology**
 
-*CodeArchaeologist Studio — Where compiler science meets software archaeology*
+*Compiler-Grade AST · Live Shift Handover · Empirical Benchmarks · Grounded Evidence AI*
 
 [![GitHub Stars](https://img.shields.io/github/stars/PanatiNitesh/codearchaeologist-studio?style=social)](https://github.com/PanatiNitesh/codearchaeologist-studio)
 
